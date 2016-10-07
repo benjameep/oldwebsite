@@ -1,5 +1,36 @@
+body{
+    margin:0;
+    padding:0;
+}
+
 #page-container{
     width:700px;
     margin:20px auto;
-    background-color:#839582;
+    /*background-color:#839582;*/
 }
+
+header{
+    text-align:center;
+}
+
+#nav{
+    text-align:center;
+    background-color:#a3a3a3;
+    padding:5px;
+}
+
+#nav a{
+    padding:10px;
+}
+
+.article{
+    width:80%;
+    margin:30px auto;
+}
+
+
+
+
+
+
+
