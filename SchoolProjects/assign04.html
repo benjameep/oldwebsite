@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Calculator</title>
+        <style>
+        body{
+            margin:0;
+            padding:0;
+            font-family: 'Roboto', sans-serif;
+            background-color:#393e41;
+        }
+        main{
+            width:500px;
+            margin:20px auto;
+        }
+        header{
+            padding:7px;
+            text-align:center;
+            background-color:#e94f37;
+        }
+        #page{
+            padding:30px 80px;
+        }
+        #form{
+            padding-top:40px;
+            padding-right:50px;
+            padding-bottom:5px;
+            text-align:right;
+            background-color:#5c415d;
+        }
+        input{
+            width:60px;
+            margin-bottom:6px;
+            text-align:right;
+        }
+        #resetbtn, #calcbtn{
+            margin-top:10px;
+            text-align:center;
+        }
+        #calcbtn{
+            margin-left:3px;
+            width:70px;
+        }
+        p{
+            margin-top:20px;
+            color:#fffc31
+        }
+        </style>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    </head>
+    <body onload="init()">
+        <main>
+            <header>
+                <h1>Mortgage Calculator</h1>
+            </header>
+            <div id="page">
+                <form id="form">
+                    Loan Amount:
+                    <input type="text" id="Amount" placeholder="$"><br/>
+                    Length of the Loan:
+                    <input type="text" id="Years" placeholder="yrs"><br/>
+                    Annual Percentage Rate:
+                    <input type="text" id="APR" placeholder="%"><br/>
+                    <input type="button" id="resetbtn" value="Clear" onclick="document.getElementById('form').reset()">
+                    <input type="button" id="calcbtn" value="Calculate" onclick="calculate()">
+                    <p id="answer"></p>
+                </form>
+            </div>
+            
+        </main>
+        <script>
+            function init(){
+                document.getElementById("Amount").focus();
+            }
+            
+            function calculate(){
+                // set the variables
+                var interest = document.getElementById("APR").value /1200;
+                var months = document.getElementById("Years").value *12;
+                var principal = document.getElementById("Amount").value *1;
+                var monthlyPayment = (principal * interest / (1 - (Math.pow(1/(1 + interest), months)))).toFixed(2);
+                
+                // check for errors
+                var hasErrors = false;
+                if(isNaN(interest)||interest==0) {
+                    document.getElementById("APR").focus(); 
+                    hasErrors=true;
+                }
+                if(isNaN(months)||months==0) {
+                    document.getElementById("Years").focus(); 
+                    hasErrors=true;
+                }
+                if(isNaN(principal)||principal==0) {
+                    document.getElementById("Amount").focus(); 
+                    hasErrors=true;
+                }
+                
+                if(!hasErrors){
+                    document.getElementById("answer").innerHTML = "$"+monthlyPayment+" per month";
+                }
+                else{
+                    document.getElementById("answer").innerHTML = "Error";
+                }
+            }
+            
+            document.onkeydown = function(e){
+                if(e.key == "Enter"){
+                    calculate();
+                }
+            }
+        </script>
+    </body>
+</html>

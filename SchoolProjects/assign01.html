@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Ben's Home Page</title>
+        <meta charset="UTF-8">
+        <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+        <style>
+            /*.primary-color         { background: #607D8B; }*/
+            /*.dark-primary-color    { background: #455A64; }*/
+            /*.Title-color           { color: #CFD8DC; }*/
+            /*.accent-color          { background: #FF9800; }*/
+            /*.primary-text-color    { color: #212121; }*/
+            /*.secondary-text-color  { color: #757575; }*/
+            /*.divider-color         { border-color: #BDBDBD; }*/
+            *{
+                margin:0px;
+                padding:0px;
+            }
+            #page-container{
+                width:800px;
+                margin: 20px auto;
+                color:#212121;
+                font-family:sans-serif;
+                /*background:#CFD8DC;*/
+            }
+            header {
+                background: #607D8B;
+                text-align:center;
+                padding-top:14px;
+                color: #CFD8DC;
+            }
+            h1 {
+                font-size:45px;
+                margin-bottom:7px;
+                color:#FFF;
+            }
+            h4 {
+                background-color:#455A64;
+                padding:5px;
+                font-size:15px;
+                font-style:italic;
+            }
+            .article {
+                position:relative;
+                display:inline-block;
+                margin: 40px 0px 40px 20px;
+                padding:20px;
+                background:#CFD8DC;
+                border-radius:5px;
+                font-size:16px;
+                width:500px;
+                margin-bottom:0px;
+            }
+            h3 {
+                border-bottom:3px solid #FF9800;
+                padding-bottom:2px;
+                margin-bottom:5px;
+                width:120px;
+                font-size:25px;
+            }
+            img{
+                float:right;
+                width:110px;
+                margin: 0px 7px 0px 15px;
+                position:relative;
+                display:inline-block;
+            }
+            blockquote{
+                margin-left:30px;
+                
+                font-size:17px;
+                
+            }
+            #sidebar{
+                display:inline-block;
+                background:#CFD8DC;
+                height:300px;
+                width:140px;
+                float:right;
+                margin-top:40px;
+                padding:15px;
+                padding-right:25px;
+                border-radius:5px 0px 0px 5px;
+                font-size:14px;
+            }
+            #sidebar p {
+                font-size:15px;
+                border-bottom:2px solid #FF9800;
+                padding-bottom:3px;
+                margin-bottom:7px;
+            }
+            #sidebar a {
+                display:block;
+                margin-bottom:8px;
+                font-family:serif;
+            }
+            #sidebar #break{
+                border-bottom:1px solid #BDBDBD;
+                margin-bottom:5px;
+                padding:7px;
+                margin-bottom:13px;
+            }
+            footer {
+                margin-top:40px;
+                 background: #455A64;
+                 padding:8px;
+                 text-align:center;
+                 position:relative;
+                 bottom:0px;
+            }
+            th {
+                width:120px;
+                text-align:left;
+            }
+            .description{
+                font-size:13px;
+                font-family:serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="page-container">
+            <header>
+                <h1>You Are Here</h1>
+                <h4><em>at Ben's Home Page</em></h4>
+            </header>
+            <div id="sidebar">
+                <p><em>Games I have created in HTML Canvas:</em></p>
+                <a href="../snake/index.html" style="font-family:serif;">Awesome Snake Game</a>
+                <a href="../GameOfLife/index.html" >Game of Life</a>
+                <p id="break"></p>
+                <a href="../index.html">Assingments</a>
+            </div>
+            <div class="article">
+                <img src="http://sensatejournal.com/wp-content/themes/sensate/images/icon_programming.png" alt="Programming Computer">
+                <br/>
+                <h3>Hello!</h3>
+                <p>
+                    My name is Benjamin Earl.
+                    I am a Computer Science Major, like everyone else 
+                    reading this, and I am from Rexburg. 
+                    But I graduated from high school in Hawaii.
+                </p>
+                <br/>
+                <blockquote style="font-family: 'Indie Flower', cursive;">
+                    "According to astronomy, when you wish upon a star <br/>
+                    You are actually a few million years late<br/>
+                    That star is dead, just like your dreams."
+                </blockquote>
+            </div>
+            <div class=article>
+                <h3>Schedule</h3>
+                <table style="width:100%">
+                    <tr> <th>CS 235-01</th> <td>Data Structures</td> <td>MWF 9:00-10:00</td><td>STR 394</td></tr>
+                    <tr> <td></td><td colspan="3" class="description">Builds on the foundation of CS 124 and CS 165 to introduce the fundamental concepts of 
+                    data structures and the algorithms that proceed from them.</td> </tr>
+                    <tr> <th>MATH 341-01</th> <td>Linear Algebra</td> <td>MWF 11:30-12:30</td><td>RKS 180</td></tr>
+                    <tr> <td></td><td colspan="3" class="description">This course covers systems of linear equations, matrices, determinants, 
+                    eigenvalues and eigenvectors, vectors, vector spaces, linear transformations, and applications.</td> </tr>
+                    <tr> <th>FDREL 333-02</th> <td>Living Prophets</td> <td>TR 8:00-10:00</td><td>TAY 100</td></tr>
+                    <tr> <td></td><td colspan="3" class="description">This course centers its emphasis on the role, function, and teachings of living prophets, seers, 
+                    and revelators as building blocks of faith in a world of challenge and confusion.</td> </tr>
+                    <tr> <th>CS 213-01</th> <td>Web Engeneering</td> <td>TR 11:30-1:00</td> <td>STR 375</td></tr>
+                    <tr> <td></td><td colspan="3" class="description">Internet and web basics, web fundamentals, web browsers, web servers, and web terminology. 
+                    This course teaches the concepts behind the fundamental tools used for building client-side web applications. 
+                    It emphasizes client side programming standards and programming tools used to create dynamic web applications.</td> </tr>
+
+                </table>
+            </div>
+            
+            <footer>
+                <a href="../index.html">Assingments</a>
+            </footer>
+        </div>
+    </body>
+</html>
