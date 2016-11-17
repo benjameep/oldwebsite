@@ -11,7 +11,6 @@ var isFirstRound = true;
 // CONSTANTS
 let GRID_SIZE = 17;
 let SPEED = 27;
-let GROWTH_PERCENT = 0.005; // or
 let CONST_GROWTH = 5;
 
 // COLORS!!! :)
@@ -33,19 +32,15 @@ var Cell = function(x,y){
 }
 
 var Grid = {
-    width: 0,
-    height: 0,
-    offsetX: 0,
-    offsetY: 0,
     init: function (){
         this.width = Math.floor(screen.width / GRID_SIZE);
         this.height = Math.floor(screen.height / GRID_SIZE);
-        this.offsetX = (screen.width % GRID_SIZE) / 2;
-        this.offsetY = (screen.height % GRID_SIZE) / 2;
+        this.offsetX = Math.floor((screen.width % GRID_SIZE) / 2);
+        this.offsetY = Math.floor((screen.height % GRID_SIZE) / 2);
         },
     draw: function(Cell){
         
-        ctx.fillRect(Grid.offsetX + Cell.x * GRID_SIZE, Grid.offsetY + Cell.y * GRID_SIZE, GRID_SIZE +1,GRID_SIZE +1);
+        ctx.fillRect(Grid.offsetX + Cell.x * GRID_SIZE, Grid.offsetY + Cell.y * GRID_SIZE, GRID_SIZE,GRID_SIZE);
     }
 }
 
@@ -130,6 +125,7 @@ var Snake = {
                this.body[0].y == this.body[i].y){
                 isPlaying = false;
                 isFirstRound = false;
+                window.setTimeout(function(){Snake.reset("right")},500);
                 }
             }
         // check if we found the actual food
@@ -152,14 +148,14 @@ var Snake = {
         this.body = [new Cell(Math.floor(Grid.width/2), Math.floor(Grid.height/2))];
         this.length = 5;
         this.instructions = [];
-        this.lastDirection = direction;
+        // this.lastDirection = direction;
     }
 }
 
 var food = {
     x : Math.floor(Math.random() * (Grid.width-1)),
     y : Math.floor(Math.random() * (Grid.height-1)),
-    worth : CONST_GROWTH,//Math.floor(Grid.width * Grid.height * GROWTH_PERCENT),
+    worth : CONST_GROWTH,
     findNewPlace : function(){
         this.x = Math.floor(Math.random() * (Grid.width-1));
         this.y = Math.floor(Math.random() * (Grid.height-1));
@@ -225,44 +221,23 @@ function init(){
         switch(event.keyCode) {
             case 65: // a
             case 37: // <-
-                if(isPlaying){
-                        Snake.instructions.push("left");
-                } else {
-                    Snake.reset("left");
-                }
+                Snake.instructions.push("left");
                 break;
             case 87: // w
             case 38: // ^
-            if(isPlaying){
-                    Snake.instructions.push("up");
-                } else {
-                    Snake.reset("up");
-                }
+                Snake.instructions.push("up");
                 break;
             case 68: // d
             case 39: // ->
-            if(isPlaying){
-                    Snake.instructions.push("right");
-                } else {
-                    Snake.reset("right");
-                }
+                Snake.instructions.push("right");
                 break;
             case 83: // s
             case 40: // v
-            if(isPlaying){
-                    Snake.instructions.push("down");
-                } else {
-                    Snake.reset("down");
-                }
+                Snake.instructions.push("down");
                 break;
             case 86: // V
                 isDayView = !isDayView;
                 break;
-            case 32: // space
-            case 13: // enter
-                if(!isPlaying){
-                    Snake.reset("right");
-                }
             default:
             return;
             }
