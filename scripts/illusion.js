@@ -313,9 +313,9 @@ function draw(){
     ctx.clearRect(0,0,screen.width,screen.height)
     blocks.draw()
     // hover.draw()
-    for(var i = 0; i < blocks.blocks.length; i++){
-    	blocks.blocks[i].debugDraw();
-    }
+    // for(var i = 0; i < blocks.blocks.length; i++){
+    // 	blocks.blocks[i].debugDraw();
+    // }
 }
 
 /* Keyboard Handler */
