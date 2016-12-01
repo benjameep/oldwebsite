@@ -212,10 +212,12 @@ class Blocks {
 	deleteBlock(point){
 		// see if it is a ligitiment club member
 		var index = this.findIndex(point)
-		// May he rest in piece
-		this.blocks.splice(index,1)
-		
 		if(index == -1) {return}
+		
+		// May he rest in piece
+		console.log(this.blocks[index].blockNum)
+		this.blocks.splice(index,1)
+
 		// get affiliations to look the other way, for a good clean murder
 		var liveNghbrs = this.getLiveNeighbors(point)
 		for(var key in liveNghbrs)
@@ -311,9 +313,9 @@ function draw(){
     ctx.clearRect(0,0,screen.width,screen.height)
     blocks.draw()
     // hover.draw()
-    // for(var i = 0; i < blocks.blocks.length; i++){
-    // 	blocks.blocks[i].debugDraw();
-    // }
+    for(var i = 0; i < blocks.blocks.length; i++){
+    	blocks.blocks[i].debugDraw();
+    }
 }
 
 /* Keyboard Handler */
