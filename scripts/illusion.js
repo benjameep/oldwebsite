@@ -212,16 +212,18 @@ class Blocks {
 	deleteBlock(point){
 		// see if it is a ligitiment club member
 		var index = this.findIndex(point)
+		// May he rest in piece
+		this.blocks.splice(index,1)
+		
 		if(index == -1) {return}
 		// get affiliations to look the other way, for a good clean murder
 		var liveNghbrs = this.getLiveNeighbors(point)
 		for(var key in liveNghbrs)
 			liveNghbrs[key].nghbr[this.opp(key)] = null
 		// tell affiliations to make new friends, like this never happened
-		// for(let key in liveNghbrs)
-		// 	this.cleanUpLooseEnds(liveNghbrs[key])
-		// then finally get their dead body out of the club
-		this.blocks.splice(index,1)
+		for(let key in liveNghbrs)
+			this.cleanUpLooseEnds(liveNghbrs[key])
+		
 	}
 	T(point){ 
     	return new Cord(point.x,point.y-4)
