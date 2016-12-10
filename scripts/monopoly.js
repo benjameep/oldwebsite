@@ -50,8 +50,10 @@ class Property{
         this.id = rotation*10 + num
         this.data = data[this.id]
         this.dev = "Single"
+        this.color = this.getColor()
+        this.monop = this.getMonop()
     }
-    draw(offx=0,offy=0,rotate=true){
+    draw(offx=0,offy=0,rotate=true,grow=1){
         ctx.save();
         ctx.translate( this.x+offx+this.width/2, this.y+offy+this.height/2 )
         if(rotate)
@@ -59,18 +61,34 @@ class Property{
         // [0,0] is now in the middle of the rectangle
         ctx.fillStyle = "#EEE"
         ctx.strokeStyle = "#000";
-        ctx.lineWidth = board.gridSize*0.05
-        ctx.fillRect( -this.width/2, -this.height/2, this.width,this.height)
-        ctx.strokeRect( -this.width/2, -this.height/2, this.width,this.height)
-        ctx.fillStyle = this.color(this.id)
-        if(this.color(this.id))
+        let chg = {width:this.width*grow, height:this.height*grow}
+        ctx.lineWidth = board.gridSize*0.05*grow
+        ctx.fillRect( -chg.width/2, -chg.height/2, chg.width,chg.height)
+        ctx.strokeRect( -chg.width/2, -chg.height/2, chg.width,chg.height)
+        if(this.color)
         {
-            ctx.fillRect( -this.width/2, -this.height/2, this.width,this.height*(1-PROP_BODY))
-            ctx.strokeRect( -this.width/2, -this.height/2, this.width,this.height*(1-PROP_BODY))
+            ctx.fillStyle = this.color
+            ctx.fillRect( -chg.width/2, -chg.height/2, chg.width,chg.height*(1-PROP_BODY))
+            ctx.strokeRect( -chg.width/2, -chg.height/2, chg.width,chg.height*(1-PROP_BODY))
         }
         ctx.restore();
     }
-    color(){
+    drawIcon(x,y,num){
+        let size = board.gridSize*.25
+        ctx.lineWidth = board.gridSize*0.05*.4
+        var topY = y
+        for(var i = 0; i < num; i++, y = topY + i*size*.35){
+            ctx.fillStyle = "#EEE"
+            ctx.fillRect(x,y,size,size)
+            ctx.strokeRect(x,y,size,size)
+            if(this.color){
+                ctx.fillStyle = this.color
+                ctx.fillRect(x,y,size,size*.4)
+                ctx.strokeRect(x,y,size,size*.4)
+            }
+        }
+    }
+    getColor(){
         switch(this.id)
         {
             case 0:
@@ -107,6 +125,51 @@ class Property{
                 return ""
         }
     }
+    getMonop(){
+        switch(this.id)
+        {
+            case 0:
+            case 1:
+            case 2:
+                return 1
+            case 4:
+            case 5:
+                return 0
+            case 10:
+            case 11:
+            case 12:
+                return 3
+            case 14:
+            case 15:
+            case 17:
+                return 2
+            case 20:
+            case 21:
+            case 22:
+                return 4
+            case 24:
+            case 25:
+            case 27:
+                return 5
+            case 30:
+            case 31:
+            case 32:
+                return 6
+            case 34:
+            case 35:
+                return 7
+            case 3:
+            case 13:
+            case 23:
+            case 33:
+                return 8
+            case 16:
+            case 26:
+                return 9
+            default:
+                return -1
+        }
+    }
 }
 
 class Player{
@@ -118,6 +181,7 @@ class Player{
         this.props = {}
         this.balance = 0;
         this.value = 0;
+        this.monops = [{amount:0},{amount:0},{amount:0},{amount:0},{amount:0},{amount:0},{amount:0},{amount:0},{amount:0},{amount:0}]
     }
     initPosition(numPlayers){
         let margin = board.gridSize*0.07
@@ -142,6 +206,25 @@ class Player{
         ctx.font = "30px Arial"
         ctx.textBaseline = "middle"
         ctx.fillText(this.balance.toFixed(1),this.x+this.width/2,this.y+this.height/2)
+        this.drawProps()
+    }
+    drawProps(){
+        let numMonops = 0
+        for(var i = 0; i < this.monops.length; i++){
+            if(this.monops[i].amount)
+                numMonops++
+        }
+        let iconSize = board.gridSize*.25
+        let padding = (this.width*.85 - iconSize*(numMonops > 5 ? numMonops : 5))/((numMonops > 5 ? numMonops : 5)+1)
+        console.log(iconSize,numMonops*(iconSize+padding))
+        let x = this.x + (this.width - numMonops*(iconSize) - (numMonops-1)*(padding))/2
+        let y = this.y + this.height*.70
+        for(var i = 0; i < this.monops.length; i++){
+            if(this.monops[i].amount > 0){
+                this.monops[i].prop.drawIcon(x,y,this.monops[i].amount)
+                x += padding + iconSize
+            }
+        }
     }
     addProp(id){
         if(!this.props[id]){ // if it dosen't have it already
@@ -157,9 +240,12 @@ class Player{
                     this.props[data[id].Bros[i]].dev = 0
             }
             this.updateValue()
+            this.monops[this.props[id].monop].amount++
+            this.monops[this.props[id].monop].prop = this.props[id]
         }
     }
     removeProp(id){
+        this.monops[this.props[id].monop].amount--
         for(let i = 0; i < data[id].Bros.length; i++){
             if(this.props[data[id].Bros[i]])
                 this.props[data[id].Bros[i]].dev = "Single"
@@ -198,6 +284,10 @@ class Game{
             this.players[i].initPosition(this.players.length)
     }
     whichPlayer(mX,mY){
+        // if mouse is outside of the middle of the board
+        if(mX > board.x+board.gridSize*6 || mX < board.x+board.gridSize*2 ||
+            mY > board.y+board.gridSize*8 || mY < board.y+board.gridSize*2)
+            return -1
         let x = Math.floor((mX-board.x-board.gridSize*2)/(this.players[0].width))
         let y = Math.floor((mY-board.y-board.gridSize*2)/(this.players[0].height))
         let player = this.players.length < 4 ? y : x+y*2
@@ -263,8 +353,8 @@ function whichProp(mX,mY){
         if(mouseIsDown)
         {
             DRAW()
-            let dragProp = new Property(Math.floor(prop/10),prop%10)
-            dragProp.draw(e.pageX-start.x,e.pageY-start.y,0)
+            let dragProp = board.props[prop];
+            dragProp.draw(e.pageX-start.x,e.pageY-start.y,0,1)
         }
     }
     window.onmouseup = function(e)
@@ -282,6 +372,7 @@ function DRAW(){
     ctx.fillRect(0,0,screen.width,screen.height)
     board.draw()
     game.draw()
+
 }
 
 window.onresize = function(){
@@ -292,7 +383,7 @@ window.onresize = function(){
 }
 window.onload = function(){
     board = new Board()
-    game = new Game(6)
+    game = new Game(4)
     board.initProps()
     DRAW()
 }
