@@ -70,6 +70,10 @@ class Property{
             ctx.fillStyle = this.color
             ctx.fillRect( -chg.width/2, -chg.height/2, chg.width,chg.height*(1-PROP_BODY))
             ctx.strokeRect( -chg.width/2, -chg.height/2, chg.width,chg.height*(1-PROP_BODY))
+            if(this.dev != "Single" && this.dev != "0"){
+                let houseSize = this.width/2
+                this.drawHouses(-houseSize/2,chg.height/2-(chg.height*PROP_BODY)/2 - houseSize/2,houseSize)
+            }
         }
         ctx.restore();
     }
@@ -87,6 +91,43 @@ class Property{
                 ctx.strokeRect(x,y,size,size*.4)
             }
         }
+    }
+    drawHouses(x,y,size){
+        ctx.fillStyle = "green"
+        switch(this.dev){
+            case 1:
+                this.drawHouse(x+size/4,y+size/4,size/2)
+                break
+            case 2:
+                this.drawHouse(x-1,y+size/4,size/2)
+        		this.drawHouse(x+size/2+1,y+size/4,size/2)
+                break
+            case 3:
+            	this.drawHouse(x-1,y+size/2+1,size/2)
+		        this.drawHouse(x+size/2+1,y+size/2+1,size/2)
+		        this.drawHouse(x+size/4,y,size/2)
+		        break
+		    case 4:
+		    	this.drawHouse(x-1,y+size/2+1,size/2)
+		        this.drawHouse(x+size/2+1,y+size/2+1,size/2)
+		        this.drawHouse(x-1,y,size/2)
+		        this.drawHouse(x+size/2+1,y,size/2)
+		        break
+		    case 5:
+		    	ctx.fillStyle = "red"
+        		this.drawHouse(x,y+size/4,size/2,1)
+		    	break
+        }
+    }
+    drawHouse(x,y,size,hotel=0){
+        ctx.beginPath()
+        ctx.moveTo(x,y+size*.4)
+        ctx.lineTo(x+size*.5,y)
+        ctx.lineTo(x+size*(hotel + .5),y)
+        ctx.lineTo(x+size*(hotel + 1),y+size*.4)
+        ctx.lineTo(x+size*(hotel + 1),y+size)
+        ctx.lineTo(x,y+size)
+        ctx.fill();
     }
     getColor(){
         switch(this.id)
@@ -195,12 +236,14 @@ class Player{
         this.width -= margin*2
         this.height -= margin*2
     }
-    draw(){
+    draw(grow = 1){
+    	let growWidth = (this.width*(grow-1))
+    	let growHeight = (this.height*(grow-1))
         ctx.fillStyle = this.color
-        ctx.fillRect(this.x,this.y,this.width,this.height)
+        ctx.fillRect(this.x-growWidth/2,this.y-growHeight/2,this.width+growWidth,this.height+growHeight)
         ctx.lineWidth = board.gridSize*0.05
         ctx.strokeStyle = "#000"
-        ctx.strokeRect(this.x,this.y,this.width,this.height)
+        ctx.strokeRect(this.x-growWidth/2,this.y-growHeight/2,this.width+growWidth,this.height+growHeight)
         ctx.fillStyle = "#FFF"
         ctx.textAlign = "center"
         ctx.font = "30px Arial"
@@ -216,7 +259,6 @@ class Player{
         }
         let iconSize = board.gridSize*.25
         let padding = (this.width*.85 - iconSize*(numMonops > 5 ? numMonops : 5))/((numMonops > 5 ? numMonops : 5)+1)
-        console.log(iconSize,numMonops*(iconSize+padding))
         let x = this.x + (this.width - numMonops*(iconSize) - (numMonops-1)*(padding))/2
         let y = this.y + this.height*.70
         for(var i = 0; i < this.monops.length; i++){
@@ -350,11 +392,21 @@ function whichProp(mX,mY){
     }
     window.onmousemove = function(e)
     {
+    	let hoverProp = whichProp(e.pageX,e.pageY)
         if(mouseIsDown)
         {
             DRAW()
-            let dragProp = board.props[prop];
-            dragProp.draw(e.pageX-start.x,e.pageY-start.y,0,1)
+            
+            let hoverPlayer = game.whichPlayer(e.pageX,e.pageY)
+            if(hoverPlayer != -1){
+            	game.players[hoverPlayer].draw(1.05)
+            }
+            board.props[prop].draw(e.pageX-start.x,e.pageY-start.y,0,1.1)
+        } else if (hoverProp != -1) {
+        	DRAW()
+        	board.props[hoverProp].draw(0,0,1,1.1)
+        } else {
+        	DRAW()
         }
     }
     window.onmouseup = function(e)
