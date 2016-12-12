@@ -492,7 +492,7 @@ window.onresize = function(){
 }
 window.onload = function(){
     board = new Board()
-    game = new Game(3)
+    game = new Game(4)
     board.initProps()
     DRAW()
 }
