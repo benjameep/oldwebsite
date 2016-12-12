@@ -53,7 +53,7 @@ class Property{
         this.color = this.getColor()
         this.monop = this.getMonop()
     }
-    draw(offx=0,offy=0,rotate=true,grow=1){
+    draw(offx=0,offy=0,rotate=true,grow=1,hover = false){
         ctx.save();
         ctx.translate( this.x+offx+this.width/2, this.y+offy+this.height/2 )
         if(rotate)
@@ -64,6 +64,12 @@ class Property{
         let chg = {width:this.width*grow, height:this.height*grow}
         ctx.lineWidth = board.gridSize*0.05*grow
         ctx.fillRect( -chg.width/2, -chg.height/2, chg.width,chg.height)
+        if(hover && !((this.id%10)%3==0 && this.id%10!=0) && this.dev != "Single"){
+            ctx.fillStyle = "#000"
+            let padding = this.width*.15
+            this.drawPlus(0+padding/2,(chg.height-chg.width+padding)/2,chg.width/2-padding,this.rotation!=2)
+            this.drawPlus((-chg.width+padding)/2,(chg.height-chg.width+padding)/2,chg.width/2-padding,this.rotation==2)
+        }
         ctx.strokeRect( -chg.width/2, -chg.height/2, chg.width,chg.height)
         if(this.color)
         {
@@ -71,10 +77,12 @@ class Property{
             ctx.fillRect( -chg.width/2, -chg.height/2, chg.width,chg.height*(1-PROP_BODY))
             ctx.strokeRect( -chg.width/2, -chg.height/2, chg.width,chg.height*(1-PROP_BODY))
             if(this.dev != "Single" && this.dev != "0"){
-                let houseSize = this.width/2
-                this.drawHouses(-houseSize/2,chg.height/2-(chg.height*PROP_BODY)/2 - houseSize/2,houseSize)
+                let houseSize = chg.width/2
+                // chg.height/2-(chg.height*PROP_BODY)/2 - houseSize/2
+                this.drawHouses(-houseSize/2,-houseSize/2,houseSize)
             }
         }
+
         ctx.restore();
     }
     drawIcon(x,y,num){
@@ -128,6 +136,16 @@ class Property{
         ctx.lineTo(x+size*(hotel + 1),y+size)
         ctx.lineTo(x,y+size)
         ctx.fill();
+    }
+    drawPlus(x,y,size,twoLines=true){
+        let width = size/8
+        let padding = size*.3
+        ctx.fillStyle = (twoLines && this.dev==5) || (!twoLines && this.dev==0) ? "#CCC" : "#88e288"
+        ctx.fillRect(x,y,size,size)
+        ctx.fillStyle = (twoLines && this.dev==5) || (!twoLines && this.dev==0) ? "#444" : "#000"
+        ctx.fillRect(x+padding/2,y+(size-width)/2,size-padding,width)
+        if(twoLines)
+            ctx.fillRect(x+(size-width)/2,y+padding/2,width,size-padding)
     }
     getColor(){
         switch(this.id)
@@ -211,6 +229,20 @@ class Property{
                 return -1
         }
     }
+    upgrade(){
+        this.dev++
+        for(var i = 0; i < data[this.id].Bros.length; i++){
+            if(this.dev - board.props[data[this.id].Bros[i]].dev == 2)
+                board.props[data[this.id].Bros[i]].dev++
+        }
+    }
+    downgrade(){
+        this.dev--
+        for(var i = 0; i < data[this.id].Bros.length; i++){
+            if(this.dev - board.props[data[this.id].Bros[i]].dev == -2)
+                board.props[data[this.id].Bros[i]].dev--
+        }
+    }
 }
 
 class Player{
@@ -246,9 +278,9 @@ class Player{
         ctx.strokeRect(this.x-growWidth/2,this.y-growHeight/2,this.width+growWidth,this.height+growHeight)
         ctx.fillStyle = "#FFF"
         ctx.textAlign = "center"
-        ctx.font = "30px Arial"
+        ctx.font = board.gridSize*.4 + "px Arial"
         ctx.textBaseline = "middle"
-        ctx.fillText(this.balance.toFixed(1),this.x+this.width/2,this.y+this.height/2)
+        ctx.fillText(this.balance.toFixed(1),this.x+this.width/2,this.y+this.height*.4)
         this.drawProps()
     }
     drawProps(){
@@ -308,6 +340,7 @@ class Player{
                 this.value += parseFloat(data[prop].Short[numBros])
             }
         }
+        return this.value
     }
 }
 
@@ -341,17 +374,20 @@ class Game{
     addProp(player,prop){
         if(this.players[player].props[prop]) // if it already has it
             return
+        this.removeProp(prop)
+        this.players[player].addProp(prop)
+        this.updateBalance()
+    }
+    removeProp(prop){
         for(let i = 0; i < this.players.length; i++){
             if(this.players[i].props[prop])
                 this.players[i].removeProp(prop)
         }
-        this.players[player].addProp(prop)
-        this.updateBalance()
     }
     updateBalance(){
         let total = 0
         for(let i = 0; i < this.players.length; i++)
-            total += this.players[i].value
+            total += this.players[i].updateValue()
         for(let i = 0; i < this.players.length; i++)
             this.players[i].balance = this.players[i].value*this.players.length - total
         DRAW()
@@ -359,20 +395,28 @@ class Game{
 }
 
 function whichProp(mX,mY){
-	let x = Math.floor((mX-board.x)/(board.gridSize));
-	let y = Math.floor((mY-board.y)/(board.gridSize));
-	if(x<8 && x>=0 && y>=0 && y<10)
+	let px = Math.floor((mX-board.x)/(board.gridSize));
+	let py = Math.floor((mY-board.y)/(board.gridSize));
+	let bx = Math.floor(((mX-board.x)%(board.gridSize*2))/(board.gridSize/2))
+	let by = Math.floor(((mY-board.y)%(board.gridSize*2))/(board.gridSize/2))
+	let answer = { prop:-1, button:0 }
+	if(px<8 && px>=0 && py>=0 && py<10)
 	{
-		if(x>=2 && y>=8)
-			return x-2
-		else if(x<2 && y>=2)
-			return 10+y-2
-		else if(y<2)
-			return 20+x
-		else if(x>=6 && y>=2 && y<8)
-			return 30+y-2
+		if(px>=2 && py>=8 && by != 0) // bottom
+			answer = { prop:px-2, button:(1+bx%2)*(by==3) }
+		else if(px<2 && py>=2 && bx != 3) // left
+		    answer = { prop:10+py-2, button:(1+by%2)*(bx==0) }
+		else if(py<2 && by != 3) // top
+		    answer = { prop:20+px, button:(1+bx%2)*(by==0) }
+		else if(px>=6 && py>=2 && py<8 && bx != 0) // right
+		    answer = { prop:30+py-2, button:(1+(by%2==0))*(bx==3) }
 	}
-	return -1;
+	if(answer.prop != -1 && (((answer.prop%10)%3==0 && answer.prop%10!=0) || 
+	    board.props[answer.prop].dev == "Single" ||
+	    (board.props[answer.prop].dev == 0 && answer.button == 1) ||
+	    (board.props[answer.prop].dev == 5 && answer.button == 2)))
+	    answer.button = 0
+	return answer
 }
 
 /* MOUSE HANDLERS */ 
@@ -382,17 +426,27 @@ function whichProp(mX,mY){
     let prop = -1
     window.onmousedown = function(e)
     {
-        prop = whichProp(e.pageX,e.pageY)
+        let area = whichProp(e.pageX,e.pageY)
+        prop = area.prop
         if(prop != -1)
         {
-            mouseIsDown = true
-            start.x = e.pageX
-            start.y = e.pageY
+            if(area.button == 0){
+                mouseIsDown = true
+                start.x = e.pageX
+                start.y = e.pageY
+            } else if(area.button == 1){
+                board.props[prop].downgrade()
+                game.updateBalance()
+            } else {
+                board.props[prop].upgrade()
+                game.updateBalance()
+            }
+            board.props[prop].draw(0,0,1,1.1,true)
         }
     }
     window.onmousemove = function(e)
     {
-    	let hoverProp = whichProp(e.pageX,e.pageY)
+    	let hoverProp = whichProp(e.pageX,e.pageY).prop
         if(mouseIsDown)
         {
             DRAW()
@@ -404,7 +458,7 @@ function whichProp(mX,mY){
             board.props[prop].draw(e.pageX-start.x,e.pageY-start.y,0,1.1)
         } else if (hoverProp != -1) {
         	DRAW()
-        	board.props[hoverProp].draw(0,0,1,1.1)
+        	board.props[hoverProp].draw(0,0,1,1.1,true)
         } else {
         	DRAW()
         }
@@ -412,9 +466,10 @@ function whichProp(mX,mY){
     window.onmouseup = function(e)
     {
         let player = game.whichPlayer(e.pageX,e.pageY)
-        DRAW()
         if(mouseIsDown && player != -1)
             game.addProp(player,prop)
+        else if(mouseIsDown && whichProp(e.pageX,e.pageY).prop == -1)
+            game.removeProp(prop)
         mouseIsDown = false
     }
 }
@@ -435,7 +490,7 @@ window.onresize = function(){
 }
 window.onload = function(){
     board = new Board()
-    game = new Game(4)
+    game = new Game(3)
     board.initProps()
     DRAW()
 }
