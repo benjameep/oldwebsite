@@ -468,8 +468,10 @@ function whichProp(mX,mY){
         let player = game.whichPlayer(e.pageX,e.pageY)
         if(mouseIsDown && player != -1)
             game.addProp(player,prop)
-        else if(mouseIsDown && whichProp(e.pageX,e.pageY).prop == -1)
+        else if(mouseIsDown && whichProp(e.pageX,e.pageY).prop == -1){
             game.removeProp(prop)
+            game.updateBalance()
+        }
         mouseIsDown = false
     }
 }
