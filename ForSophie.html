@@ -65,24 +65,32 @@
 		<main>
 			<input type="radio" name="direction" checked onchange="encrypt(1)" id="encryptBtn"><span>Encrypt</span>
 			<input type="radio" name="direction" onchange="encrypt(2)" id="decryptBtn"><span>Decrypt</span><br/>
+			
 			<textarea onkeyup="encrypt()" rows="5" cols="38" id="input" onfocus="this.select()" placeholder="Start typing here..." onpaste="paste()"></textarea><br/>
+			
 			<textarea readonly rows="5" cols="38" id="output" onfocus="this.select()"></textarea><br/>
 			<button id="copyBtn" onclick="copy()">Copy to Clipboard</button>
 		</main>
 		<script>
 			var input = document.getElementById("input");
 			var output = document.getElementById("output");
+			var inputSize = 0;
 			var isEncrypting = true;
 			function paste(){
 				document.getElementById("decryptBtn").checked = true;
 				isEncrypting = false;
 			}        
 			function encrypt(encrypt = 0){
-				if(encrypt != 0){ isEncrypting = (encrypt == 1 ? true : false) }
-				console.log(isEncrypting);
-				if(isEncrypting)
+				if(encrypt != 0){ 
+					isEncrypting = (encrypt == 1 ? true : false);
+				} else if (input.value.length > inputSize){
+					inputSize = input.value.length;
+					isEncrypting = true;
+					document.getElementById("encryptBtn").checked = true;
+				}
+				if(isEncrypting){
 					output.value = convertBase(input.value,94,93);
-				else
+				} else
 					output.value = convertBase(input.value,93,94);
 			}
 			function convertBase(value, from_base, to_base) {
