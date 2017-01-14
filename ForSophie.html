@@ -63,8 +63,8 @@
 			<h3>My Funny Little Encryption Program :)</h3>
 		</header>
 		<main>
-			<input type="radio" name="direction" checked onchange="encrypt(1)" id="encryptBtn"><span>Encrypt</span>
-			<input type="radio" name="direction" onchange="encrypt(2)" id="decryptBtn"><span>Decrypt</span><br/>
+			<input type="radio" name="direction" onclick="setIsEncrypting(true)" id="encryptBtn" checked><span>Encrypt</span>
+			<input type="radio" name="direction" onclick="setIsEncrypting(false)" id="decryptBtn"><span>Decrypt</span><br/>
 			
 			<textarea onkeyup="encrypt()" rows="5" cols="38" id="input" onfocus="this.select()" placeholder="Start typing here..." onpaste="paste()"></textarea><br/>
 			
@@ -74,20 +74,31 @@
 		<script>
 			var input = document.getElementById("input");
 			var output = document.getElementById("output");
-			var inputSize = 0;
+			var oldInput = "";
 			var isEncrypting = true;
+			function setIsEncrypting(bool){
+				isEncrypting = bool;
+				document.getElementById("encryptBtn").checked = bool;
+				document.getElementById("decryptBtn").checked = !bool;
+				encrypt();
+			}
 			function paste(){
-				document.getElementById("decryptBtn").checked = true;
-				isEncrypting = false;
-			}        
-			function encrypt(encrypt = 0){
-				if(encrypt != 0){ 
-					isEncrypting = (encrypt == 1 ? true : false);
-				} else if (input.value.length > inputSize){
-					inputSize = input.value.length;
-					isEncrypting = true;
-					document.getElementById("encryptBtn").checked = true;
+				setIsEncrypting(false);
+				window.setTimeout(function(){
+					console.log(input.value);
+					oldInput = input.value;
+				},1);
+			}
+			function checkForEdits(){
+				if (input.value != oldInput){
+					oldInput = input.value;
+					setIsEncrypting(true);
 				}
+			}
+			function encrypt(){
+
+				checkForEdits();
+				
 				if(isEncrypting){
 					output.value = convertBase(input.value,94,93);
 				} else
