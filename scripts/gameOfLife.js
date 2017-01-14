@@ -193,9 +193,10 @@ function init() {
 			}
 		// 187 +
 		// 189 -
-		
-		//alert(event.keyCode);
+		// console.log(event.keyCode);
+
 		switch(event.keyCode) {
+			
 			case 187:
 			Grid.zoom("in");
 			break;
@@ -234,11 +235,13 @@ function init() {
 				game.invert(high.x,high.y,game.aliveCells);
 				break;
 			case 13: // enter
-			game.isPlaying = !game.isPlaying;
-			// game.update();
-			break;
+				game.isPlaying = !game.isPlaying;
+				break;
+			case 221: // ]
+				game.update();
+				break;
 			case 32: // space
-			game.clickMode = "move";
+				game.clickMode = "move";
 			break;
 			default:
 			return;
